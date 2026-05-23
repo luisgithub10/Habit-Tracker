@@ -660,7 +660,6 @@ export default function App() {
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
-    backgroundAttachment: 'fixed',
     backgroundColor: 
       settings.bgTheme === 'light_blue' 
         ? '#bae6fd' 
@@ -670,16 +669,23 @@ export default function App() {
   };
 
   return (
-    <div 
-      className={`min-h-screen flex flex-col pb-20 md:pb-6 transition-all duration-300 select-none overflow-x-hidden ${
-        settings.bgTheme && settings.bgTheme !== 'none' ? 'bg-transparent' : 'bg-neutral-50'
-      }`} 
-      style={bgStyle}
-      id="app-root-container"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
+    <>
+      {/* Bulletproof fixed viewport background layer */}
+      <div 
+        className={`fixed inset-0 z-0 pointer-events-none transition-all duration-300 ${
+          settings.bgTheme && settings.bgTheme !== 'none' ? 'opacity-100' : 'bg-neutral-50'
+        }`}
+        style={settings.bgTheme && settings.bgTheme !== 'none' ? bgStyle : undefined}
+        id="app-fixed-background"
+      />
+
+      <div 
+        className="relative z-10 min-h-screen flex flex-col pb-20 md:pb-6 transition-all duration-300 select-none overflow-x-hidden bg-transparent" 
+        id="app-root-container"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
       {/* Header Bar */}
       <header className="bg-white border-b border-neutral-100 sticky top-0 z-40 px-4 py-3 shadow-3xs">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
@@ -811,6 +817,7 @@ export default function App() {
         })}
       </div>
     </div>
+    </>
   );
 }
 
