@@ -120,7 +120,7 @@ export default function TodayView({
     if (bgTheme === 'light_pink') {
       return `glass-panel bg-white/75 backdrop-blur-md rounded-2xl ${borderOverride || 'border border-pink-200/50'} shadow-xs ${additionalClasses}`;
     }
-    return `bg-white rounded-2xl border ${borderOverride || 'border-neutral-100'} shadow-xs ${additionalClasses}`;
+    return `bg-neutral-100/80 rounded-2xl border ${borderOverride || 'border-neutral-200/60'} shadow-xs ${additionalClasses}`;
   };
 
   const getHabitItemClass = () => {

@@ -828,7 +828,6 @@ export default function App() {
                 onAddHabit={handleAddHabit}
                 onNavigateToday={() => handleSetView('today')}
                 onResetAllData={handleResetAllData}
-                onShowPwaGuide={() => setShowPwaSplash(true)}
               />
             )}
           </motion.div>
@@ -904,6 +903,16 @@ export default function App() {
                 Log health, fitness, mindfulness, and habits using a clean, offline-first dashboard.
               </p>
 
+              {/* iPhone Safari warning notice */}
+              <div className="mt-4 w-full bg-rose-50 border border-rose-200 rounded-2xl p-3.5 text-left">
+                <p className="text-[10px] font-black text-rose-800 leading-normal flex items-start gap-1.5">
+                  <span className="shrink-0 text-xs">⚠️</span>
+                  <span>
+                    <strong>APPLE iOS USERS:</strong> You <span className="underline">MUST</span> open this tracker in the <strong className="font-black">Safari browser</strong> to add or install it on your Home Screen!
+                  </span>
+                </p>
+              </div>
+
               <div className="bg-neutral-50 border border-neutral-150/80 rounded-2xl p-4 w-full mt-4 text-left">
                 <span className="text-[9px] font-black text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full uppercase tracking-wider mb-2.5 inline-block">
                   Add To Home Screen
@@ -941,20 +950,25 @@ export default function App() {
                 {/* Tab Info */}
                 {splashTab === 'ios' ? (
                   <div className="space-y-2 text-[11px] text-neutral-600 leading-relaxed">
-                    <div className="bg-rose-50 border border-rose-100 rounded-xl p-2.5 mb-2.5 text-rose-700 font-black text-[10px] text-center leading-normal">
-                      ⚠️ APPLE iOS USERS:<br />You MUST open this app in the <span className="underline">Safari browser</span> to install it on your home screen!
+                    <div className="bg-rose-50 border border-rose-100 rounded-xl p-3 mb-2.5 text-rose-700 font-extrabold text-[10px] text-center leading-normal">
+                      ⚠️ CRITICAL APPLE iOS REQUIREMENT:<br />
+                      You <span className="underline font-black text-rose-800">MUST</span> use the <span className="bg-rose-100 border border-rose-200 px-1 py-0.5 rounded font-black text-rose-900">Safari browser</span> to run and install this app. Other browsers like Chrome or Firefox on iOS do NOT support adding to your Home Screen!
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">1</span>
-                      <span>Tap the <strong>Safari Share</strong> button <Share className="inline-block w-3 h-3 mx-0.5 shrink-0 stroke-[2.5px]" /> at the bottom.</span>
+                      <span>Open this exact screen inside your iPhone's built-in <strong>Safari Browser</strong>.</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">2</span>
-                      <span>Scroll list down and tap <strong>"Add to Home Screen"</strong> <Plus className="inline-block w-3 h-3 mx-0.5 shrink-0 stroke-[2.5px]" />.</span>
+                      <span>Tap the <strong>Safari Share</strong> button <Share className="inline-block w-3 h-3 mx-0.5 shrink-0 stroke-[2.5px]" /> at the bottom navigation bar.</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">3</span>
-                      <span>Tap <strong>"Add"</strong> in top corner to complete pin placement.</span>
+                      <span>Scroll down the options list and select <strong>"Add to Home Screen"</strong> <Plus className="inline-block w-3 h-3 mx-0.5 shrink-0 stroke-[2.5px]" />.</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">4</span>
+                      <span>Tap <strong>"Add"</strong> in the top-right corner to complete placing the app icon.</span>
                     </div>
                   </div>
                 ) : (
@@ -989,7 +1003,7 @@ export default function App() {
                 <button
                   id="pwa-splash-dismiss-forever-btn"
                   onClick={() => {
-                    localStorage.setItem('habitloop_pwa_splash_dismissed', 'true');
+                    handleUpdateSettings({ pwaSplashEnabled: false });
                     setShowPwaSplash(false);
                   }}
                   className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-extrabold py-2 px-4 rounded-xl text-[10px] uppercase tracking-wider cursor-pointer transition-colors border border-neutral-200 shadow-3xs"

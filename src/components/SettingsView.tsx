@@ -11,7 +11,6 @@ interface SettingsViewProps {
   onAddHabit: (habit: Omit<Habit, 'id' | 'createdAt'>) => void;
   onNavigateToday: () => void;
   onResetAllData: () => void;
-  onShowPwaGuide?: () => void;
 }
 
 const CATEGORIES = [
@@ -35,8 +34,7 @@ export default function SettingsView({
   onUpdateSettings,
   onAddHabit,
   onNavigateToday,
-  onResetAllData,
-  onShowPwaGuide
+  onResetAllData
 }: SettingsViewProps) {
   const [userName, setUserName] = useState(settings.userName);
   const [dailyGoal, setDailyGoal] = useState(settings.dailyGoal);
@@ -52,7 +50,7 @@ export default function SettingsView({
     if (settings.bgTheme === 'light_pink') {
       return `glass-panel bg-white/75 backdrop-blur-md rounded-2xl ${borderOverride || 'border border-pink-200/50'} shadow-xs ${additionalClasses}`;
     }
-    return `bg-white rounded-2xl border ${borderOverride || 'border-neutral-150'} shadow-xs ${additionalClasses}`;
+    return `bg-neutral-100/80 rounded-2xl border ${borderOverride || 'border-neutral-200/60'} shadow-xs ${additionalClasses}`;
   };
 
   // Form states moved from TodayView
@@ -744,20 +742,6 @@ export default function SettingsView({
                   </p>
                 </div>
               </div>
-            </div>
-          )}
-          
-          {onShowPwaGuide && (
-            <div className="pt-3 border-t border-neutral-100/60">
-              <button
-                type="button"
-                id="btn-launch-pwa-guide"
-                onClick={onShowPwaGuide}
-                className="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] uppercase tracking-wider py-2 px-3.5 rounded-xl transition-all cursor-pointer shadow-3xs hover:shadow-2xs"
-              >
-                <Smartphone className="w-3.5 h-3.5" />
-                Launch Step-by-Step Setup Guide
-              </button>
             </div>
           )}
         </div>
