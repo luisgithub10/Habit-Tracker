@@ -873,7 +873,7 @@ export default function App() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 30 }}
               transition={{ type: 'spring', damping: 25, stiffness: 180 }}
-              className="bg-white rounded-3xl border border-neutral-100 p-6 shadow-2xl max-w-sm w-full my-auto text-center relative flex flex-col items-center"
+              className="bg-white rounded-3xl border border-neutral-100 p-6 shadow-2xl max-w-sm md:max-w-3xl w-full my-auto text-center relative flex flex-col items-center"
               id="pwa-splash-container"
             >
               {/* Close button */}
@@ -887,116 +887,98 @@ export default function App() {
               </button>
 
               {/* Pulsing visual glow background for the icon */}
-              <div className="relative mb-5 flex justify-center items-center">
-                <div className="absolute inset-x-0 -inset-y-2 w-24 h-24 bg-indigo-100/50 rounded-full blur-xl animate-pulse" />
+              <div className="relative mb-4 flex justify-center items-center">
+                <div className="absolute inset-x-0 -inset-y-2 w-20 h-20 bg-indigo-100/50 rounded-full blur-xl animate-pulse" />
                 <img 
-                  src="./icon.png" 
+                  src="./icon.png?v=3" 
                   alt="HabitLoop Logo" 
-                  className="w-20 h-20 rounded-2xl shadow-md border border-neutral-100 object-contain relative z-10"
+                  className="w-16 h-16 rounded-2xl shadow-md border border-neutral-100 object-contain relative z-10"
                   referrerPolicy="no-referrer"
                 />
               </div>
 
               {/* Title & Brand descriptor */}
-              <h2 className="text-lg font-black text-neutral-900 tracking-tight leading-tight">Welcome to HabitLoop</h2>
-              <p className="text-[11px] font-semibold text-neutral-500 mt-1.5 leading-relaxed max-w-xs">
+              <h2 className="text-xl font-black text-neutral-900 tracking-tight leading-tight">Welcome to HabitLoop</h2>
+              <p className="text-[11px] font-semibold text-neutral-500 mt-1 leading-relaxed max-w-sm">
                 Log health, fitness, mindfulness, and habits using a clean, offline-first dashboard.
               </p>
 
-              <div className="bg-neutral-50 border border-neutral-150/80 rounded-2xl p-4 w-full mt-4 text-left">
-                <span className="text-[9px] font-black text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full uppercase tracking-wider mb-2.5 inline-block">
-                  Add To Home Screen
-                </span>
-                <p className="text-xs font-bold text-neutral-800 leading-normal mb-3">
-                  Install this tracker onto your device's home screen for full standalone full-screen view.
-                </p>
+              <div className="w-full mt-4 text-left">
+                <div className="flex flex-col md:flex-row gap-4.5">
+                  
+                  {/* Apple iOS Column */}
+                  <div className="flex-1 bg-neutral-50 border border-neutral-150/80 rounded-2xl p-4 flex flex-col">
+                    <span className="text-[9px] font-black text-rose-700 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-full uppercase tracking-wider mb-2.5 inline-block self-start">
+                      Apple iOS (iPhone / iPad) Guide
+                    </span>
+                    
+                    <div className="bg-rose-100/60 border border-rose-200/80 rounded-xl p-2.5 mb-3 text-rose-800 font-extrabold text-[10px] leading-normal flex gap-1.5 items-start">
+                      <span className="shrink-0 text-xs">⚠️</span>
+                      <span>
+                        You <span className="underline font-black text-rose-900">MUST</span> use the built-in <strong className="font-black text-rose-950 bg-white/70 px-1 py-0.5 rounded border border-rose-300">Safari browser</strong> to download/add this app. iOS Chrome, Firefox, or Edge do NOT support Home Screen icons!
+                      </span>
+                    </div>
 
-                {/* Tab selector */}
-                <div className="grid grid-cols-2 gap-1 bg-neutral-150 p-1 rounded-xl mb-3 border border-neutral-200">
-                  <button
-                    type="button"
-                    onClick={() => setSplashTab('ios')}
-                    className={`py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center ${
-                      splashTab === 'ios' 
-                        ? 'bg-white text-indigo-700 shadow-3xs' 
-                        : 'text-neutral-500 hover:text-neutral-700'
-                    }`}
-                  >
-                    Apple iOS
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSplashTab('android')}
-                    className={`py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center ${
-                      splashTab === 'android' 
-                        ? 'bg-white text-indigo-700 shadow-3xs' 
-                        : 'text-neutral-550 hover:text-neutral-700'
-                    }`}
-                  >
-                    Android / PC
-                  </button>
+                    <div className="space-y-2 text-[11px] text-neutral-600 leading-relaxed">
+                      <div className="flex items-start gap-2">
+                        <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">1</span>
+                        <span>Open this web application inside your iPhone's built-in <strong>Safari Browser</strong>.</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">2</span>
+                        <span>Tap the <strong>Safari Share</strong> icon <Share className="inline-block w-3 h-3 mx-0.5 shrink-0 stroke-[2.5px]" /> at the bottom action bar.</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">3</span>
+                        <span>Scroll through the sheet items and tap <strong>"Add to Home Screen"</strong> <Plus className="inline-block w-3 h-3 mx-0.5 shrink-0 stroke-[2.5px]" />.</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">4</span>
+                        <span>Tap <strong>"Add"</strong> in the top-right corner to place it on your home screen.</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Android / PC Column */}
+                  <div className="flex-1 bg-neutral-50 border border-neutral-150/80 rounded-2xl p-4 flex flex-col">
+                    <span className="text-[9px] font-black text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full uppercase tracking-wider mb-2.5 inline-block self-start">
+                      Android / PC / Chrome Guide
+                    </span>
+
+                    <div className="bg-indigo-100/40 border border-indigo-150/70 rounded-xl p-2.5 mb-3 text-indigo-800 font-extrabold text-[10px] leading-normal flex gap-1.5 items-start">
+                      <span className="shrink-0 text-xs">💡</span>
+                      <span>
+                        For full standalone features and automatic database restoration, open this tracker in <strong>Google Chrome</strong> or <strong>Samsung Internet</strong>.
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 text-[11px] text-neutral-600 leading-relaxed">
+                      <div className="flex items-start gap-2">
+                        <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">1</span>
+                        <span>Open browser panel menu <MoreVertical className="inline-block w-3 h-3 mx-0.5 shrink-0 stroke-[2.5px]" /> on Chrome or tap the prompt banner at the bottom.</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="font-extrabold text-indigo-600 bg-indigo-100/50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">2</span>
+                        <span>Tap <strong>"Install App"</strong> or the <strong>"Add to Home Screen"</strong> menu item.</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="font-extrabold text-indigo-600 bg-indigo-100/50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">3</span>
+                        <span>Press the confirmation button on the popup to complete setup.</span>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
-
-                {/* Tab Info */}
-                {splashTab === 'ios' ? (
-                  <div className="space-y-2 text-[11px] text-neutral-600 leading-relaxed">
-                    <div className="bg-rose-50 border border-rose-100 rounded-xl p-3 mb-2.5 text-rose-700 font-extrabold text-[10px] text-left leading-normal flex gap-1.5 items-start">
-                      <span className="shrink-0">⚠️</span>
-                      <span>
-                        <strong>CRITICAL APPLE iOS REQUIREMENT:</strong><br />
-                        You <span className="underline font-black text-rose-800">MUST</span> use the built-in <span className="bg-rose-100 border border-rose-200 px-1 py-0.5 rounded font-black text-rose-900">Safari browser</span> to run and install this app. Other browsers (Chrome, Firefox, etc.) on iOS do NOT support adding items to your Home Screen!
-                      </span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">1</span>
-                      <span>Open this tracker dashboard inside your iPhone's built-in <strong>Safari Browser</strong>.</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">2</span>
-                      <span>Tap the <strong>Safari Share</strong> button <Share className="inline-block w-3 h-3 mx-0.5 shrink-0 stroke-[2.5px]" /> at the bottom navigation bar.</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">3</span>
-                      <span>Scroll down the option sheet and select <strong>"Add to Home Screen"</strong> <Plus className="inline-block w-3 h-3 mx-0.5 shrink-0 stroke-[2.5px]" />.</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">4</span>
-                      <span>Tap <strong>"Add"</strong> in the top-right corner to place it on your home screen.</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-2 text-[11px] text-neutral-600 leading-relaxed">
-                    <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-3 mb-2.5 text-indigo-700 font-extrabold text-[10px] text-left leading-normal flex gap-1.5 items-start">
-                      <span className="shrink-0">💡</span>
-                      <span>
-                        <strong>RECOMMENDED ANDROID METHOD:</strong><br />
-                        For the best progressive app features, open this tracker in <strong>Google Chrome</strong> or <strong>Samsung Internet</strong>.
-                      </span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">1</span>
-                      <span>Open browser panel menu <MoreVertical className="inline-block w-3 h-3 mx-0.5 shrink-0 stroke-[2.5px]" /> on Chrome/Edge or tap the bottom banner prompt.</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">2</span>
-                      <span>Tap <strong>"Install App"</strong> or <strong>"Add to Home Screen"</strong>.</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">3</span>
-                      <span>Confirm permission on device popup prompt to finish.</span>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Actions Button */}
-              <div className="w-full flex flex-col gap-2 mt-5">
+              <div className="w-full flex flex-col sm:flex-row gap-2 mt-5">
                 <button
                   id="pwa-splash-continue-btn"
                   onClick={() => {
                     setShowPwaSplash(false);
                   }}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3 px-4 rounded-xl text-xs uppercase tracking-wider cursor-pointer transition-colors shadow-xs"
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3 px-4 rounded-xl text-xs uppercase tracking-wider cursor-pointer transition-colors shadow-xs"
                 >
                   Continue for Now
                 </button>
@@ -1006,7 +988,7 @@ export default function App() {
                     handleUpdateSettings({ pwaSplashEnabled: false });
                     setShowPwaSplash(false);
                   }}
-                  className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-extrabold py-2 px-4 rounded-xl text-[10px] uppercase tracking-wider cursor-pointer transition-colors border border-neutral-200 shadow-3xs"
+                  className="flex-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-extrabold py-3 px-4 rounded-xl text-xs uppercase tracking-wider cursor-pointer transition-colors border border-neutral-200 shadow-3xs"
                 >
                   Do Not Show Anymore
                 </button>
