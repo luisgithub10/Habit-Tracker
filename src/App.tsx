@@ -680,7 +680,7 @@ export default function App() {
       />
 
       <div 
-        className="relative z-10 min-h-screen flex flex-col pb-20 md:pb-6 transition-all duration-300 select-none overflow-x-hidden bg-transparent" 
+        className="relative z-10 min-h-screen w-full flex flex-col pb-20 md:pb-6 transition-all duration-300 select-none overflow-x-hidden bg-transparent" 
         id="app-root-container"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
