@@ -7,7 +7,6 @@ import {
 
 import lightBlueBg from './assets/images/light_blue_bg_1779491889250.png';
 import lightPinkBg from './assets/images/light_pink_bg_1779491909327.png';
-import habitLoopIcon from './assets/images/habit_loop_icon_1779570587726.png';
 
 import { Habit, HabitCompletion, HabitProgress, AppSettings, ViewType } from './types';
 import TodayView from './components/TodayView';
@@ -128,7 +127,6 @@ export default function App() {
   const [pageDirection, setPageDirection] = useState<'left' | 'right' | null>(null);
 
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState<boolean>(false);
-  const [iconError, setIconError] = useState<boolean>(false);
 
   // Navigates and updates page slide direction index
   const handleSetView = (newView: ViewType) => {
@@ -698,19 +696,24 @@ export default function App() {
       <header className="bg-white border-b border-neutral-100 sticky top-0 z-40 px-4 py-2.5 shadow-3xs">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            {iconError ? (
-              <div id="habitloop-fallback-logo" className="w-9 h-9 rounded-xl bg-indigo-600 border border-indigo-500/30 flex items-center justify-center text-white font-black text-xs tracking-wider shadow-xs shrink-0 select-none animate-none">
-                HL
-              </div>
-            ) : (
-              <img 
-                src="icon.png?v=4" 
-                alt="HabitLoop Logo" 
-                className="w-9 h-9 rounded-xl shadow-xs object-cover shrink-0"
-                referrerPolicy="no-referrer"
-                onError={() => setIconError(true)}
+            <svg 
+              className="w-9 h-9 shrink-0 select-none shadow-2xs rounded-xl" 
+              viewBox="0 0 100 100" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+              id="habitloop-brand-svg-logo"
+            >
+              <rect width="100" height="100" rx="24" fill="#4f46e5" />
+              <path 
+                d="M50 25c13.8 0 25 11.2 25 25s-11.2 25-25 25-25-11.2-25-25 11.2-25 25-25z" 
+                stroke="#ffffff" 
+                strokeWidth="9" 
+                strokeLinecap="round" 
+                strokeDasharray="110 40" 
               />
-            )}
+              <circle cx="50" cy="25" r="9" fill="#38bdf8" />
+              <circle cx="50" cy="50" r="10" fill="#ffffff" />
+            </svg>
             <div>
               <h1 className="text-base font-black tracking-tight text-neutral-900 leading-none">HabitLoop</h1>
             </div>
