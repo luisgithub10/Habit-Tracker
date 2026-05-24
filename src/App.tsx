@@ -128,6 +128,7 @@ export default function App() {
   const [pageDirection, setPageDirection] = useState<'left' | 'right' | null>(null);
 
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState<boolean>(false);
+  const [iconError, setIconError] = useState<boolean>(false);
 
   // Navigates and updates page slide direction index
   const handleSetView = (newView: ViewType) => {
@@ -697,12 +698,19 @@ export default function App() {
       <header className="bg-white border-b border-neutral-100 sticky top-0 z-40 px-4 py-2.5 shadow-3xs">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img 
-              src="icon.png?v=4" 
-              alt="HabitLoop Logo" 
-              className="w-9 h-9 rounded-xl shadow-xs object-cover shrink-0"
-              referrerPolicy="no-referrer"
-            />
+            {iconError ? (
+              <div id="habitloop-fallback-logo" className="w-9 h-9 rounded-xl bg-indigo-600 border border-indigo-500/30 flex items-center justify-center text-white font-black text-xs tracking-wider shadow-xs shrink-0 select-none animate-none">
+                HL
+              </div>
+            ) : (
+              <img 
+                src="icon.png?v=4" 
+                alt="HabitLoop Logo" 
+                className="w-9 h-9 rounded-xl shadow-xs object-cover shrink-0"
+                referrerPolicy="no-referrer"
+                onError={() => setIconError(true)}
+              />
+            )}
             <div>
               <h1 className="text-base font-black tracking-tight text-neutral-900 leading-none">HabitLoop</h1>
             </div>
