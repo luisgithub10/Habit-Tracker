@@ -1,6 +1,6 @@
 {
-  "name": "HabitLoop Tracker",
-  "short_name": "HabitLoop",
+  "name": "Habit Tracker",
+  "short_name": "Habit Tracker",
   "description": "Log health, fitness, mindfulness, and habits using a clean, offline-first dashboard.",
   "start_url": ".",
   "display": "standalone",
