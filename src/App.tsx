@@ -680,9 +680,9 @@ export default function App() {
       {/* Bulletproof fixed viewport background layer */}
       <div 
         className={`fixed inset-0 z-0 pointer-events-none transition-all duration-300 ${
-          settings.bgTheme && settings.bgTheme !== 'none' ? 'opacity-100' : 'bg-neutral-200'
+          settings.bgTheme && settings.bgTheme !== 'none' ? 'opacity-100' : ''
         }`}
-        style={settings.bgTheme && settings.bgTheme !== 'none' ? bgStyle : undefined}
+        style={settings.bgTheme && settings.bgTheme !== 'none' ? bgStyle : { backgroundColor: '#b3b3b3' }}
         id="app-fixed-background"
       />
 
@@ -698,7 +698,7 @@ export default function App() {
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <img 
-              src={habitLoopIcon} 
+              src="/icon.png?v=4" 
               alt="HabitLoop Logo" 
               className="w-9 h-9 rounded-xl shadow-xs object-cover shrink-0"
               referrerPolicy="no-referrer"
