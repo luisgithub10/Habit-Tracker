@@ -699,12 +699,12 @@ export default function App() {
           <div className="flex items-center gap-2.5">
             <img 
               src={LOGO_BASE64} 
-              alt="HabitLoop Logo" 
+              alt="Habit Tracker Logo" 
               className="w-9 h-9 rounded-xl shadow-xs object-cover shrink-0 select-none"
               referrerPolicy="no-referrer"
             />
             <div>
-              <h1 className="text-base font-black tracking-tight text-neutral-900 leading-none">HabitLoop</h1>
+              <h1 className="text-base font-black tracking-tight text-neutral-900 leading-none">Habit Tracker</h1>
             </div>
           </div>
 
