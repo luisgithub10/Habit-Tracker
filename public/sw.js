@@ -1,11 +1,12 @@
-const CACHE_NAME = 'habitloop-v2';
+const CACHE_NAME = 'habitloop-v3';
 
-// Essential starter paths
+// Essential starter paths - relative to PWA subdirectory/scope
 const PRE_CACHE_ASSETS = [
-  '/',
-  '/index.html',
-  '/icon.png',
-  '/manifest.json'
+  './',
+  'index.html',
+  'icon.png',
+  'icon.png?v=5',
+  'manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -77,9 +78,9 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       }).catch((err) => {
         console.warn('Network fetch failed for resource offline:', err);
-        // If it's a main document request, fallback to root
+        // If it's a main document request, fallback to relative index/scope root
         if (event.request.mode === 'navigate') {
-          return caches.match('/');
+          return caches.match('./') || caches.match('index.html');
         }
       });
     })

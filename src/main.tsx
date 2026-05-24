@@ -6,7 +6,8 @@ import './index.css';
 // Register Cache-First Service Worker for complete offline capabilities and iOS persistence
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    // Relative registration ensures compatibility with subdirectories e.g. GitHub Pages
+    navigator.serviceWorker.register('./sw.js')
       .then((reg) => {
         console.log('Service Worker registered successfully:', reg.scope);
       })
