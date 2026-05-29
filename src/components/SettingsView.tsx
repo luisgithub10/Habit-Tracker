@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  User, Volume2, Check, Smartphone, Sliders, Dumbbell, Brain, Heart, BookOpen, Coins, Clock, Sparkles, X, Info, AlertTriangle, RotateCcw
+  User, Volume2, Check, Smartphone, AlertTriangle, RotateCcw, Download
 } from 'lucide-react';
 import { AppSettings, Habit } from '../types';
-
 interface SettingsViewProps {
   settings: AppSettings;
   onUpdateSettings: (newSettings: Partial<AppSettings>) => void;
-  onAddHabit: (habit: Omit<Habit, 'id' | 'createdAt'>) => void;
   onNavigateToday: () => void;
   onResetAllData: () => void;
+  onAddHabit: (habit: Omit<Habit, 'id' | 'createdAt'>) => void;
+  onBackupStore: () => any;
+  onRestoreStore: (data: any) => Promise<boolean>;
 }
 
 const CATEGORIES = [
@@ -29,18 +30,68 @@ const COLORS = [
   { name: 'sky', border: 'border-sky-200', text: 'text-sky-600', bg: 'bg-sky-500 hover:bg-sky-600' },
 ];
 
+import { 
+  Dumbbell, Brain, Heart, BookOpen, Coins, Clock, Sparkles, X, Info
+} from 'lucide-react';
+
 export default function SettingsView({
   settings,
   onUpdateSettings,
-  onAddHabit,
   onNavigateToday,
-  onResetAllData
+  onResetAllData,
+  onAddHabit,
+  onBackupStore,
+  onRestoreStore
 }: SettingsViewProps) {
   const [userName, setUserName] = useState(settings.userName);
   const [dailyGoal, setDailyGoal] = useState(settings.dailyGoal);
   const [isSaved, setIsSaved] = useState(false);
   const [showCreatedMessage, setShowCreatedMessage] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showRestoreSuccess, setShowRestoreSuccess] = useState(false);
+  
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleBackupClick = () => {
+    const data = onBackupStore();
+    const jsonStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `habit-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleRestoreClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const contents = event.target?.result as string;
+        const parsed = JSON.parse(contents);
+        const success = await onRestoreStore(parsed);
+        if (success) {
+          setShowRestoreSuccess(true);
+        } else {
+          alert('Invalid backup file. Please check that the file is in the correct backup format.');
+        }
+      } catch (err) {
+        alert('Failed to parse backup file. Make sure it is a valid .json file.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
 
   // Dynamic glassmorphic background configurations matching user request
   const getPanelClass = (additionalClasses = '', borderOverride = '') => {
@@ -49,6 +100,9 @@ export default function SettingsView({
     }
     if (settings.bgTheme === 'light_pink') {
       return `glass-panel bg-white/75 backdrop-blur-md rounded-2xl ${borderOverride || 'border border-pink-200/50'} shadow-xs ${additionalClasses}`;
+    }
+    if (settings.bgTheme === 'light_green') {
+      return `glass-panel bg-white/75 backdrop-blur-md rounded-2xl ${borderOverride || 'border border-emerald-200/50'} shadow-xs ${additionalClasses}`;
     }
     return `bg-neutral-100/80 rounded-2xl border ${borderOverride || 'border-neutral-200/60'} shadow-xs ${additionalClasses}`;
   };
@@ -205,7 +259,7 @@ export default function SettingsView({
       {/* Profile & preferences row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
         {/* Profile/Goal setting section */}
-        <div className={getPanelClass("p-5 w-full max-w-[400px] h-full")}>
+        <div className={getPanelClass("p-5 w-full max-w-[400px] h-full")} style={{ backgroundColor: '#ffffff' }}>
           <h3 className="text-sm font-bold tracking-tight text-neutral-800 flex items-center gap-2 mb-4">
             <User className="w-4 h-4 text-indigo-700" /> Profile Configurations
           </h3>
@@ -243,7 +297,7 @@ export default function SettingsView({
         </div>
 
         {/* Sound & PWA Splash Preferences Section */}
-        <div className={getPanelClass("p-5 w-full max-w-[400px] h-full flex flex-col justify-between")}>
+        <div className={getPanelClass("p-5 w-full max-w-[400px] h-full flex flex-col justify-between")} style={{ backgroundColor: '#fffcfc' }}>
           <div>
             <h3 className="text-sm font-bold tracking-tight text-neutral-800 flex items-center gap-2 mb-4">
               <Volume2 className="w-4 h-4 text-indigo-700" /> App Preferences
@@ -274,14 +328,14 @@ export default function SettingsView({
         </div>
 
         {/* Background Theme Card */}
-        <div className={getPanelClass("p-5 w-full max-w-[400px] h-full")}>
+        <div className={getPanelClass("p-5 w-full max-w-[400px] h-full")} style={{ backgroundColor: '#fffbfb' }}>
           <h3 className="text-sm font-bold tracking-tight text-neutral-800 flex items-center gap-2 mb-4">
             <Smartphone className="w-4 h-4 text-indigo-700" /> App Background
           </h3>
 
           <div className="space-y-3">
             <span className="text-[10px] font-bold text-neutral-500 block uppercase tracking-wider">Background Theme</span>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {/* Option 1: None */}
               <button
                 id="btn-bg-theme-none"
@@ -289,14 +343,17 @@ export default function SettingsView({
                 onClick={() => onUpdateSettings({ bgTheme: 'none' })}
                 className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all text-center cursor-pointer ${
                   settings.bgTheme === 'none' || !settings.bgTheme
-                    ? 'border-neutral-900 bg-neutral-900 text-white shadow-3xs font-bold scale-[1.02]'
+                    ? 'border-neutral-950 bg-neutral-950 text-white shadow-3xs font-bold scale-[1.02]'
                     : 'border-neutral-200 hover:border-neutral-400 bg-white text-neutral-700'
                 }`}
               >
-                <div className="w-full h-8 rounded-lg bg-neutral-100 border border-neutral-200 mb-1 flex items-center justify-center text-[10px] text-neutral-400 font-mono">
-                  None
+                <div 
+                  className="w-full h-8 rounded-lg border mb-1 flex items-center justify-center text-[10px] text-neutral-750 font-bold font-mono"
+                  style={{ backgroundColor: '#bebebe', borderColor: '#a8a8a8' }}
+                >
+                  Gray
                 </div>
-                <span className="text-[9px] font-bold leading-tight block truncate">Plain Minimal</span>
+                <span className="text-[9px] font-bold leading-tight block truncate">None (Solid Gray)</span>
               </button>
 
               {/* Option 2: Light Blue */}
@@ -306,11 +363,11 @@ export default function SettingsView({
                 onClick={() => onUpdateSettings({ bgTheme: 'light_blue' })}
                 className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all text-center cursor-pointer ${
                   settings.bgTheme === 'light_blue'
-                    ? 'border-neutral-900 bg-neutral-900 text-white shadow-3xs font-bold scale-[1.02]'
+                    ? 'border-neutral-950 bg-neutral-950 text-white shadow-3xs font-bold scale-[1.02]'
                     : 'border-neutral-200 hover:border-neutral-400 bg-white text-neutral-700'
                 }`}
               >
-                <div className="w-full h-8 rounded-lg bg-sky-200 border border-sky-300 mb-1 flex items-center justify-center text-[9px] text-sky-850 font-mono overflow-hidden">
+                <div className="w-full h-8 rounded-lg bg-sky-100 border border-sky-200 mb-1 flex items-center justify-center text-[9px] text-sky-800 font-mono overflow-hidden">
                   <span className="text-[8px] opacity-75 leading-tight font-bold text-sky-700">Blue</span>
                 </div>
                 <span className="text-[9px] font-bold leading-tight block truncate">Light Blue</span>
@@ -323,7 +380,7 @@ export default function SettingsView({
                 onClick={() => onUpdateSettings({ bgTheme: 'light_pink' })}
                 className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all text-center cursor-pointer ${
                   settings.bgTheme === 'light_pink'
-                    ? 'border-neutral-900 bg-neutral-900 text-white shadow-3xs font-bold scale-[1.02]'
+                    ? 'border-neutral-950 bg-neutral-950 text-white shadow-3xs font-bold scale-[1.02]'
                     : 'border-neutral-200 hover:border-neutral-400 bg-white text-neutral-700'
                 }`}
               >
@@ -332,282 +389,108 @@ export default function SettingsView({
                 </div>
                 <span className="text-[9px] font-bold leading-tight block truncate">Light Pink</span>
               </button>
+
+              {/* Option 4: Light Green */}
+              <button
+                id="btn-bg-theme-green"
+                type="button"
+                onClick={() => onUpdateSettings({ bgTheme: 'light_green' })}
+                className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all text-center cursor-pointer ${
+                  settings.bgTheme === 'light_green'
+                    ? 'border-neutral-950 bg-neutral-950 text-white shadow-3xs font-bold scale-[1.02]'
+                    : 'border-neutral-200 hover:border-neutral-400 bg-white text-neutral-700'
+                }`}
+              >
+                <div className="w-full h-8 rounded-lg bg-emerald-100 border border-emerald-200 mb-1 flex items-center justify-center text-[9px] text-emerald-850 font-mono overflow-hidden">
+                  <span className="text-[8px] opacity-75 leading-tight font-bold text-emerald-600">Green</span>
+                </div>
+                <span className="text-[9px] font-bold leading-tight block truncate">Light Green</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Create Your Habit Wizards (Moved to the Setting page) */}
-      <div className="space-y-4" id="habits-creation-panel">
-        <h3 className="text-sm font-extrabold text-neutral-800 uppercase tracking-wider px-1">
-          Configure Your Habits
-        </h3>
+      {/* Data Management Section */}
+      <div className="bg-white rounded-2xl border border-neutral-150 p-6 md:p-8 shadow-xs flex flex-col space-y-4" id="data-management-section-card" style={{ borderColor: '#ffffff' }}>
+        <div className="flex items-center gap-2.5">
+          <Download className="w-5 h-5 text-indigo-600 stroke-[2.5]" />
+          <h3 className="text-base font-extrabold tracking-tight text-neutral-800">
+            Data Management
+          </h3>
+        </div>
+        
+        <p className="text-xs sm:text-sm font-semibold text-neutral-500 leading-relaxed max-w-3xl">
+          Browser cache can sometimes be cleared by your operating system, which may result in data loss. <strong className="font-bold text-neutral-700">Please create regular backups</strong> by downloading your data.
+        </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Card 1: TIME Habit Creation */}
-          <div className={getPanelClass("p-5 flex flex-col justify-between space-y-4")}>
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold text-rose-800 bg-rose-100 border border-rose-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  TIME
-                </span>
-                <Clock className="w-4 h-4 text-rose-600" />
+        <div className="flex flex-wrap gap-3 pt-1">
+          <button
+            id="btn-backup-data"
+            type="button"
+            onClick={handleBackupClick}
+            className="flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider py-3 px-5 rounded-xl transition-all cursor-pointer shadow-3xs hover:shadow-2xs"
+          >
+            <Download className="w-4 h-4 stroke-[2.5]" />
+            BACKUP DATA
+          </button>
+
+          <button
+            id="btn-restore-data"
+            type="button"
+            onClick={handleRestoreClick}
+            className="flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider py-3 px-5 rounded-xl transition-all cursor-pointer shadow-3xs hover:shadow-2xs"
+          >
+            <RotateCcw className="w-4 h-4 stroke-[2.5]" />
+            RESTORE FROM BACKUP
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".json"
+            className="hidden"
+          />
+        </div>
+      </div>
+
+      {/* Restore Success modal message */}
+      <AnimatePresence>
+        {showRestoreSuccess && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-xs">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-3xl border border-neutral-150 p-6 shadow-2xl max-w-sm w-full text-center relative animate-none"
+            >
+              <div className="mx-auto bg-emerald-100 text-emerald-600 rounded-full p-4 w-14 h-14 flex items-center justify-center mb-4">
+                <Check className="w-8 h-8 stroke-[3.5]" />
               </div>
+              <h3 className="text-base font-extrabold text-neutral-800 uppercase tracking-wider">Restore Complete!</h3>
+              <p className="text-xs font-semibold text-neutral-600 mt-2 leading-relaxed">
+                Your database backup has been successfully loaded and restored.
+              </p>
               
-              <form onSubmit={handleCreateTimeHabit} className="mt-4 space-y-3">
-                <div className="space-y-1">
-                  <label htmlFor="time-name" className="text-[10px] font-extrabold text-neutral-400 block uppercase">Habit Name</label>
-                  <input
-                    id="time-name"
-                    type="text"
-                    required
-                    placeholder="e.g., Gym Workout, Active Running"
-                    value={timeName}
-                    onChange={(e) => setTimeName(e.target.value)}
-                    className="w-full text-xs border border-neutral-200 focus:border-neutral-900 rounded-lg px-2.5 py-2 outline-hidden bg-neutral-50"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-[10px] font-extrabold text-neutral-400 block uppercase">Target Goal</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label htmlFor="time-hours" className="sr-only">Hours</label>
-                      <input
-                        id="time-hours"
-                        type="number"
-                        min="0"
-                        max="23"
-                        placeholder="Hr"
-                        value={timeHours || ''}
-                        onChange={(e) => setTimeHours(parseInt(e.target.value) || 0)}
-                        className="w-full text-xs border border-neutral-200 text-center rounded-lg py-1.5 bg-neutral-50 font-bold"
-                      />
-                      <span className="text-[9px] text-neutral-400 block text-center mt-1">Hours</span>
-                    </div>
-                    <div>
-                      <label htmlFor="time-minutes" className="sr-only">Minutes</label>
-                      <input
-                        id="time-minutes"
-                        type="number"
-                        min="0"
-                        max="59"
-                        placeholder="Min"
-                        value={timeMinutes || ''}
-                        onChange={(e) => setTimeMinutes(parseInt(e.target.value) || 0)}
-                        className="w-full text-xs border border-neutral-200 text-center rounded-lg py-1.5 bg-neutral-50 font-bold"
-                      />
-                      <span className="text-[9px] text-neutral-400 block text-center mt-1">Min</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <div>
-                    <label htmlFor="time-cat-select" className="text-[9px] font-bold text-neutral-400 block uppercase mb-1">Category</label>
-                    <select
-                      id="time-cat-select"
-                      value={timeCategory}
-                      onChange={(e) => setTimeCategory(e.target.value)}
-                      className="w-full text-[10px] border border-neutral-200 rounded-md p-1 bg-white font-semibold animate-none"
-                    >
-                      {CATEGORIES.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="time-color-select" className="text-[9px] font-bold text-neutral-400 block uppercase mb-1">Accent</label>
-                    <select
-                      id="time-color-select"
-                      value={timeColor}
-                      onChange={(e) => setTimeColor(e.target.value)}
-                      className="w-full text-[10px] border border-neutral-200 rounded-md p-1 bg-white font-semibold animate-none"
-                    >
-                      {COLORS.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                    </select>
-                  </div>
-                </div>
-
+              <div className="flex flex-col gap-2.5 mt-6">
                 <button
-                  id="btn-create-time-habit"
-                  type="submit"
-                  className="w-full bg-neutral-900 text-white font-bold text-xs py-2 px-3 rounded-lg hover:bg-neutral-800 transition-colors uppercase tracking-wider cursor-pointer"
+                  id="btn-restore-success-ok"
+                  onClick={() => {
+                    setShowRestoreSuccess(false);
+                    onNavigateToday();
+                  }}
+                  className="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-bold py-3 px-4 rounded-xl text-xs uppercase tracking-wider cursor-pointer transition-colors shadow-xs"
                 >
-                  CREATE HABIT
+                  Go to Today
                 </button>
-              </form>
-            </div>
-            
-            <p className="text-[11px] text-neutral-600 font-bold italic pt-2 border-t border-neutral-100">
-              "If you go to the gym and want it as a habit set a time habit."
-            </p>
-          </div>
-
-          {/* Card 2: Count Habit Creation */}
-          <div className={getPanelClass("p-5 flex flex-col justify-between space-y-4")}>
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold text-sky-800 bg-sky-100 border border-sky-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  Count
-                </span>
-                <Heart className="w-4 h-4 text-sky-600" />
               </div>
-
-              <form onSubmit={handleCreateQuantityHabit} className="mt-4 space-y-3">
-                <div className="space-y-1">
-                  <label htmlFor="qty-name" className="text-[10px] font-extrabold text-neutral-400 block uppercase">Habit Name</label>
-                  <input
-                    id="qty-name"
-                    type="text"
-                    required
-                    placeholder="e.g., Water Intake, Medicine"
-                    value={qtyName}
-                    onChange={(e) => setQtyName(e.target.value)}
-                    className="w-full text-xs border border-neutral-200 focus:border-neutral-900 rounded-lg px-2.5 py-2 outline-hidden bg-neutral-50"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <label htmlFor="qty-unit" className="text-[10px] font-extrabold text-neutral-400 block uppercase">Unit</label>
-                    <input
-                      id="qty-unit"
-                      type="text"
-                      required
-                      placeholder="e.g., cups, pages"
-                      value={qtyUnit}
-                      onChange={(e) => setQtyUnit(e.target.value)}
-                      className="w-full text-xs border border-neutral-200 rounded-lg px-2 py-1.5 outline-hidden bg-neutral-50 text-center font-semibold animate-none"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label htmlFor="qty-max" className="text-[10px] font-extrabold text-neutral-400 block uppercase">Max Goal</label>
-                    <input
-                      id="qty-max"
-                      type="number"
-                      min="1"
-                      placeholder="5"
-                      value={qtyMaxGoal || ''}
-                      onChange={(e) => setQtyMaxGoal(parseInt(e.target.value) || 1)}
-                      className="w-full text-xs border border-neutral-200 rounded-lg px-2 py-1.5 outline-hidden bg-neutral-50 text-center font-bold animate-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <div>
-                    <label htmlFor="qty-cat-select" className="text-[9px] font-bold text-neutral-400 block uppercase mb-1">Category</label>
-                    <select
-                      id="qty-cat-select"
-                      value={qtyCategory}
-                      onChange={(e) => setQtyCategory(e.target.value)}
-                      className="w-full text-[10px] border border-neutral-200 rounded-md p-1 bg-white font-semibold animate-none"
-                    >
-                      {CATEGORIES.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="qty-color-select" className="text-[9px] font-bold text-neutral-400 block uppercase mb-1">Accent</label>
-                    <select
-                      id="qty-color-select"
-                      value={qtyColor}
-                      onChange={(e) => setQtyColor(e.target.value)}
-                      className="w-full text-[10px] border border-neutral-200 rounded-md p-1 bg-white font-semibold animate-none"
-                    >
-                      {COLORS.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                    </select>
-                  </div>
-                </div>
-
-                <button
-                  id="btn-create-qty-habit"
-                  type="submit"
-                  className="w-full bg-neutral-900 text-white font-bold text-xs py-2 px-3 rounded-lg hover:bg-neutral-800 transition-colors uppercase tracking-wider cursor-pointer"
-                >
-                  CREATE HABIT
-                </button>
-              </form>
-            </div>
-
-            <p className="text-[11px] text-neutral-600 font-bold italic pt-2 border-t border-neutral-100">
-              "For water consumption, medication use Count."
-            </p>
+            </motion.div>
           </div>
-
-          {/* Card 3: On and Off Habit Creation */}
-          <div className={getPanelClass("p-5 flex flex-col justify-between space-y-4")}>
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold text-violet-800 bg-violet-100 border border-violet-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  On/Off
-                </span>
-                <Brain className="w-4 h-4 text-violet-600" />
-              </div>
-
-              <form onSubmit={handleCreateOnOffHabit} className="mt-4 space-y-3">
-                <div className="space-y-1">
-                  <label htmlFor="onoff-name" className="text-[10px] font-extrabold text-neutral-400 block uppercase">Habit Name</label>
-                  <input
-                    id="onoff-name"
-                    type="text"
-                    required
-                    placeholder="e.g., Zen Meditation, Read Book"
-                    value={onoffName}
-                    onChange={(e) => setOnoffName(e.target.value)}
-                    className="w-full text-xs border border-neutral-200 focus:border-neutral-900 rounded-lg px-2.5 py-2 outline-hidden bg-neutral-50"
-                  />
-                </div>
-
-                {/* Double check visual */}
-                <div className="flex items-center justify-center py-3">
-                  <div className="bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-full p-2 animate-bounce">
-                    <Check className="w-6 h-6 stroke-[3]" />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <div>
-                    <label htmlFor="onoff-cat-select" className="text-[9px] font-bold text-neutral-400 block uppercase mb-1">Category</label>
-                    <select
-                      id="onoff-cat-select"
-                      value={onoffCategory}
-                      onChange={(e) => setOnoffCategory(e.target.value)}
-                      className="w-full text-[10px] border border-neutral-200 rounded-md p-1 bg-white font-semibold animate-none"
-                    >
-                      {CATEGORIES.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="onoff-color-select" className="text-[9px] font-bold text-neutral-400 block uppercase mb-1">Accent</label>
-                    <select
-                      id="onoff-color-select"
-                      value={onoffColor}
-                      onChange={(e) => setOnoffColor(e.target.value)}
-                      className="w-full text-[10px] border border-neutral-200 rounded-md p-1 bg-white font-semibold animate-none"
-                    >
-                      {COLORS.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                    </select>
-                  </div>
-                </div>
-
-                <button
-                  id="btn-create-onoff-habit"
-                  type="submit"
-                  className="w-full bg-neutral-900 text-white font-bold text-xs py-2 px-3 rounded-lg hover:bg-neutral-800 transition-colors uppercase tracking-wider cursor-pointer"
-                >
-                  CREATE HABIT
-                </button>
-              </form>
-            </div>
-
-            <p className="text-[11px] text-neutral-600 font-bold italic pt-2 border-t border-neutral-100">
-              "For simple task just create and On Off check mark."
-            </p>
-          </div>
-        </div>
-      </div>
+        )}
+      </AnimatePresence>
 
       {/* Visual System Reset Section */}
-      <div className="bg-red-50/40 rounded-2xl p-5 border border-red-100 shadow-3xs" id="system-reset-section-card">
+      <div className="bg-red-50/40 rounded-2xl p-5 border border-red-100 shadow-3xs" id="system-reset-section-card" style={{ backgroundColor: '#ffffff' }}>
         <h3 className="text-sm font-bold tracking-tight text-red-800 flex items-center gap-2 mb-2">
           <AlertTriangle className="w-4 h-4 text-red-600" /> System Factory Reset
         </h3>
@@ -669,7 +552,7 @@ export default function SettingsView({
       </AnimatePresence>
 
       {/* Installation Instruction Block */}
-      <div className={getPanelClass("p-5 flex flex-col md:flex-row gap-4 items-start")}>
+      <div className={getPanelClass("p-5 flex flex-col md:flex-row gap-4 items-start")} style={{ backgroundColor: '#ffffff' }}>
         <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 shrink-0">
           <Smartphone className="w-5 h-5" />
         </div>
@@ -677,10 +560,10 @@ export default function SettingsView({
           {typeof window !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent) ? (
             // iPhone/iPad specific instructions
             <div className="space-y-2">
-              <span className="inline-block text-[9px] font-bold text-rose-600 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="inline-block text-[9px] font-bold text-rose-600 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded-full uppercase tracking-wider" style={{ fontWeight: 'bold', fontSize: '14px' }}>
                 Apple iOS iPhone/iPad Installation
               </span>
-              <p className="text-xs font-semibold text-neutral-800">
+              <p className="text-xs font-semibold text-neutral-800" style={{ fontSize: '15.6252px' }}>
                 To track your habits offline in full screen, you must add this app to your Home Screen using only Safari.
               </p>
               <div className="text-[11px] text-neutral-500 space-y-1.5 leading-relaxed">
@@ -701,23 +584,23 @@ export default function SettingsView({
           ) : (
             // General / Desktop / Android instructions for when published and downloading
             <div className="space-y-2 pt-0.5">
-              <span className="inline-block text-[9px] font-bold text-sky-600 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="inline-block text-[9px] font-bold text-sky-600 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-full uppercase tracking-wider" style={{ fontWeight: 'bold', fontSize: '14px' }}>
                 Add App to Home Screen
               </span>
-              <p className="text-xs font-semibold text-neutral-800">
+              <p className="text-xs font-semibold text-neutral-800" style={{ fontSize: '15.6252px' }}>
                 Install this Habit Tracker to your device's Home Screen for offline, native full-screen tracking.
               </p>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px] text-neutral-550 pt-1">
                 <div className="space-y-1.5 sm:border-r sm:border-neutral-200/55 sm:pr-4">
-                  <span className="font-bold text-[10px] text-indigo-700 block uppercase tracking-wider">iPhone & iPad (Safari Only):</span>
-                  <p className="leading-relaxed">
+                  <span className="font-bold text-[10px] text-indigo-700 block uppercase tracking-wider" style={{ fontSize: '14px' }}>iPhone & iPad (Safari Only):</span>
+                  <p className="leading-relaxed" style={{ fontSize: '14px' }}>
                     Open this link in <strong>Safari</strong>, tap the <strong>Share</strong> button <span className="text-neutral-700 font-bold">↑</span>, then select <strong>"Add to Home Screen"</strong> <span className="text-neutral-700 font-bold">+</span>. This app runs best on iOS using Safari only.
                   </p>
                 </div>
                 <div className="space-y-1.5">
-                  <span className="font-bold text-[10px] text-indigo-700 block uppercase tracking-wider">Android & Desktop (Chrome/Edge):</span>
-                  <p className="leading-relaxed">
+                  <span className="font-bold text-[10px] text-indigo-700 block uppercase tracking-wider" style={{ fontSize: '14px' }}>Android & Desktop (Chrome/Edge):</span>
+                  <p className="leading-relaxed" style={{ fontSize: '14px' }}>
                     Look for the <strong>Install Icon</strong> <span className="text-neutral-700 font-bold">⊕</span> or computer screen icon in your browser address bar, or open the browser menu and tap <strong>"Install app"</strong> or <strong>"Add to Home Screen"</strong>.
                   </p>
                 </div>

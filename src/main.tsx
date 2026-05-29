@@ -3,35 +3,49 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
+// Force trailing slash for subdirectory on GitHub Pages to prevent scope hijacking
+if (typeof window !== 'undefined' && window.location) {
+  const path = window.location.pathname;
+  if (path === '/Habit-Tracker' || path === '/habit-tracker') {
+    window.location.replace(window.location.origin + '/Habit-Tracker/' + window.location.search + window.location.hash);
+  }
+}
+
 // Register Cache-First Service Worker for complete offline capabilities and iOS persistence
 if ('serviceWorker' in navigator) {
-  // Clear any service workers registered at the absolute root (e.g., https://luisgithub10.github.io/)
-  // which might hijack pages in the /Habit-Tracker/ subdirectory.
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    let rootSWFound = false;
-    for (const reg of registrations) {
-      const isRootScope = reg.scope === window.location.origin + '/' || reg.scope === window.location.origin;
-      const onSubFolder = window.location.pathname.includes('/Habit-Tracker');
-      
-      if (isRootScope && onSubFolder) {
-        console.log('Detected hijacking root-level service worker:', reg.scope);
-        reg.unregister().then((unregistered) => {
-          if (unregistered) {
-            console.log('Unregistered root service worker successfully to restore subdirectory control.');
-            rootSWFound = true;
-          }
-        });
+  const isPwaSubfolderScope = window.location.hostname.includes('github.io') || window.location.pathname.includes('/Habit-Tracker');
+  
+  if (isPwaSubfolderScope) {
+    // Clear any service workers registered at the absolute root (e.g., https://luisgithub10.github.io/)
+    // which might hijack pages in the /Habit-Tracker/ subdirectory.
+    navigator.serviceWorker.getRegistrations().then(async (registrations) => {
+      let rootSWFound = false;
+      for (const reg of registrations) {
+        const scope = reg.scope;
+        const expectedScope = window.location.origin + '/Habit-Tracker/';
+        const isIncorrectScope = scope !== expectedScope && (scope === window.location.origin + '/' || scope === window.location.origin);
+        
+        if (isIncorrectScope) {
+          console.log('Detected hijacking root-level service worker:', scope);
+          await reg.unregister();
+          console.log('Unregistered root service worker successfully to restore subdirectory control.');
+          rootSWFound = true;
+        }
       }
-    }
-    if (rootSWFound) {
-      // Reload page after a brief delay to clear any intercepts and load the fresh scoped SW
-      setTimeout(() => {
+      if (rootSWFound) {
+        // Clear all cache storage to prevent the old root scope fallback from loading offline
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(key => caches.delete(key)));
+          console.log('Cleared all caches successfully after unregistering root service worker.');
+        }
+        // Reload page to clear any intercepts and fetch from network
         window.location.reload();
-      }, 500);
-    }
-  }).catch((err) => {
-    console.warn('Error querying service worker registrations:', err);
-  });
+      }
+    }).catch((err) => {
+      console.warn('Error querying service worker registrations:', err);
+    });
+  }
 
   window.addEventListener('load', () => {
     const isGitHubPages = window.location.hostname.includes('github.io') || window.location.pathname.includes('/Habit-Tracker');

@@ -1,11 +1,15 @@
-const CACHE_NAME = 'habitloop-v3';
+const CACHE_NAME = 'habitloop-v5';
 
 // Essential starter paths - relative to PWA subdirectory/scope
 const PRE_CACHE_ASSETS = [
   './',
   'index.html',
-  'icon.png',
-  'icon.png?v=5',
+  'icon-192.png',
+  'icon-192.png?v=5',
+  'icon-512.png',
+  'icon-512.png?v=5',
+  'apple-touch-icon.png',
+  'apple-touch-icon.png?v=5',
   'manifest.json'
 ];
 
